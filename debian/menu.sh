@@ -22,7 +22,7 @@ sudo mkdir -p "$SCRIPT_DIR"
 sudo chown "$(whoami)":"$(whoami)" "$SCRIPT_DIR"
 
 # 脚本的URL基础路径
-BASE_URL="https://ghfast.top/https://raw.githubusercontent.com/qichiyuhub/sbshell/refs/heads/master/debian"
+BASE_URL="https://ghfast.top/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/master/debian"
 
 # 脚本列表
 SCRIPTS=(
@@ -59,12 +59,12 @@ download_script() {
             chmod +x "$SCRIPT_DIR/$SCRIPT"
             return 0
         else
-            echo -e "${YELLOW}下载 $SCRIPT 失败，重试 $i/${RETRIES}...${NC}"
+            echo -e "${YELLOW}Downloading $SCRIPT failed, try again $i/${RETRIES}...${NC}"
             sleep "$RETRY_DELAY"
         fi
     done
 
-    echo -e "${RED}下载 $SCRIPT 失败，请检查网络连接。${NC}"
+    echo -e "${RED}Failed to download $SCRIPT, please check your network connection.${NC}"
     return 1
 }
 
@@ -91,15 +91,15 @@ check_and_download_scripts() {
     done
 
     if [ ${#missing_scripts[@]} -ne 0 ]; then
-        echo -e "${CYAN}正在下载脚本，请耐心等待...${NC}"
+        echo -e "${CYAN}The script is downloading, please wait patiently...${NC}"
         for SCRIPT in "${missing_scripts[@]}"; do
             download_script "$SCRIPT" || {
-                echo -e "${RED}下载 $SCRIPT 失败，是否重试？(y/n): ${NC}"
+                echo -e "${RED}Failed to download $SCRIPT, do you want to try again? (y/n): ${NC}"
                 read -r retry_choice
                 if [[ "$retry_choice" =~ ^[Yy]$ ]]; then
                     download_script "$SCRIPT"
                 else
-                    echo -e "${RED}跳过 $SCRIPT 下载。${NC}"
+                    echo -e "${RED}Skip $SCRIPT download.${NC}"
                 fi
             }
         done
@@ -133,10 +133,10 @@ auto_setup() {
 
 # 检查是否需要初始化
 if [ ! -f "$INITIALIZED_FILE" ]; then
-    echo -e "${CYAN}回车进入初始化引导设置,输入skip跳过引导${NC}"
+    echo -e "${CYAN}Press Enter to enter the initialization boot settings, enter skip to skip the boot${NC}"
     read -r init_choice
     if [[ "$init_choice" =~ ^[Ss]kip$ ]]; then
-        echo -e "${CYAN}跳过初始化引导，直接进入菜单...${NC}"
+        echo -e "${CYAN}Skip the initialization boot and go directly to the menu...${NC}"
     else
         initialize
     fi
@@ -156,25 +156,25 @@ fi
 # 菜单显示
 show_menu() {
     echo -e "${CYAN}=========== Sbshell 管理菜单 ===========${NC}"
-    echo -e "${GREEN}1. Tproxy/Tun模式切换${NC}"
-    echo -e "${GREEN}2. 手动更新配置文件${NC}"
-    echo -e "${GREEN}3. 自动更新配置文件${NC}"
-    echo -e "${GREEN}4. 手动启动 sing-box${NC}"
-    echo -e "${GREEN}5. 手动停止 sing-box${NC}"
-    echo -e "${GREEN}6. 安装/更新 sing-box${NC}"
-    echo -e "${GREEN}7. 默认参数设置${NC}"
-    echo -e "${GREEN}8. 设置自启动${NC}"
-    echo -e "${GREEN}9. 网络设置(只支持debian)${NC}"
-    echo -e "${GREEN}10. 常用命令${NC}"
-    echo -e "${GREEN}11. 更新脚本${NC}"
-    echo -e "${GREEN}12. 更新控制面板${NC}"
-    echo -e "${GREEN}0. 退出${NC}"
+    echo -e "${GREEN}1. Tproxy/Tun mode switch${NC}"
+    echo -e "${GREEN}2. Manually update the configuration file${NC}"
+    echo -e "${GREEN}3. Automatically update configuration files${NC}"
+    echo -e "${GREEN}4. Manually start sing-box${NC}"
+    echo -e "${GREEN}5. Manually stop sing-box${NC}"
+    echo -e "${GREEN}6. Install/update sing-box${NC}"
+    echo -e "${GREEN}7. Default parameter settings${NC}"
+    echo -e "${GREEN}8. Set up auto-start${NC}"
+    echo -e "${GREEN}9. Network settings (only supports debian)${NC}"
+    echo -e "${GREEN}10. Common commands${NC}"
+    echo -e "${GREEN}11. Update Script${NC}"
+    echo -e "${GREEN}12. Update Control Panel${NC}"
+    echo -e "${GREEN}0. Quit${NC}"
     echo -e "${CYAN}=======================================${NC}"
 }
 
 # 处理用户选择
 handle_choice() {
-    read -rp "请选择操作: " choice
+    read -rp "Please select an operation: " choice
     case $choice in
         1)
             bash "$SCRIPT_DIR/switch_mode.sh"
@@ -222,7 +222,7 @@ handle_choice() {
             exit 0
             ;;
         *)
-            echo -e "${RED}无效的选择${NC}"
+            echo -e "${RED}Invalid selection${NC}"
             ;;
     esac
 }
