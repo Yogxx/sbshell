@@ -13,9 +13,9 @@ SCRIPT_DIR="/etc/sing-box/scripts"
 # 检查当前模式
 check_mode() {
     if nft list chain inet sing-box prerouting_tproxy &>/dev/null || nft list chain inet sing-box output_tproxy &>/dev/null; then
-        echo "TProxy 模式"
+        echo "TProxy Mode"
     else
-        echo "TUN 模式"
+        echo "TUN Mode"
     fi
 }
 
@@ -31,27 +31,27 @@ apply_firewall() {
 
 # 启动 sing-box 服务
 start_singbox() {
-    echo -e "${CYAN}检测是否处于非代理环境...${NC}"
+    echo -e "${CYAN}Detect whether it is in a non-proxy environment...${NC}"
     STATUS_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "https://www.google.com")
 
     if [ "$STATUS_CODE" -eq 200 ]; then
-        echo -e "${RED}当前网络处于代理环境, 启动 sing-box 需要直连, 请设置!${NC}"
-        read -rp "是否执行网络设置脚本(暂只支持debian)?(y/n/skip): " network_choice
+        echo -e "${RED}The current network is in a proxy environment, and a direct connection is required to start sing-box, please set it up!${NC}"
+        read -rp "Do you want to execute the network setup script (only supports Debian at the moment)? (y/n/skip): " network_choice
         if [[ "$network_choice" =~ ^[Yy]$ ]]; then
             bash "$SCRIPT_DIR/set_network.sh"
             STATUS_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "https://www.google.com")
             if [ "$STATUS_CODE" -eq 200 ]; then
-                echo -e "${RED}网络配置更改后依然处于代理环境，请检查网络配置!${NC}"
+                echo -e "${RED}After the network configuration is changed, it is still in the proxy environment. Please check the network configuration!${NC}"
                 exit 1
             fi
         elif [[ "$network_choice" =~ ^[Ss]kip$ ]]; then
-            echo -e "${CYAN}跳过网络检查，直接启动 sing-box。${NC}"
+            echo -e "${CYAN}Skip the network check and start sing-box directly.${NC}"
         else
-            echo -e "${RED}请切换到非代理环境后再启动 sing-box。${NC}"
+            echo -e "${RED}Please switch to a non-proxy environment and then start sing-box.${NC}"
             exit 1
         fi
     else
-        echo -e "${CYAN}当前网络环境非代理网络，可以启动 sing-box。${NC}"
+        echo -e "${CYAN}The current network environment is not a proxy network, and sing-box can be started.${NC}"
     fi
 
     sudo systemctl restart sing-box &>/dev/null
@@ -59,19 +59,19 @@ start_singbox() {
     apply_firewall
 
     if systemctl is-active --quiet sing-box; then
-        echo -e "${GREEN}sing-box 启动成功${NC}"
+        echo -e "${GREEN}sing-box started successfully${NC}"
         mode=$(check_mode)
-        echo -e "${MAGENTA}当前启动模式: ${mode}${NC}"
+        echo -e "${MAGENTA}Current startup mode: ${mode}${NC}"
     else
-        echo -e "${RED}sing-box 启动失败，请检查日志${NC}"
+        echo -e "${RED}sing-box failed to start, please check the log${NC}"
     fi
 }
 
 # 提示用户确认是否启动
-read -rp "是否启动 sing-box?(y/n): " confirm_start
+read -rp "Do you want to start sing-box?(y/n): " confirm_start
 if [[ "$confirm_start" =~ ^[Yy]$ ]]; then
     start_singbox
 else
-    echo -e "${CYAN}已取消启动 sing-box。${NC}"
+    echo -e "${CYAN}Launching sing-box has been canceled.${NC}"
     exit 0
 fi
