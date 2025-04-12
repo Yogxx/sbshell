@@ -11,7 +11,7 @@ SCRIPT_DIR="/etc/sing-box/scripts"
 TEMP_DIR="/tmp/sing-box"
 
 # The script's URL base path
-BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/qichiyuhub/sbshell/refs/heads/master/openwrt"
+BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/master/openwrt"
 
 # URL for the initial download menu script
 MENU_SCRIPT_URL="$BASE_URL/menu.sh"
