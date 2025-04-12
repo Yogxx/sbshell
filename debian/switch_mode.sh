@@ -1,49 +1,49 @@
 #!/bin/bash
 
-# 定义颜色
+# Defining Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-NC='\033[0m' # 无颜色
+NC='\033[0m' # No Color
 
-# 检查 sing-box 是否已安装
+# Check if sing-box is installed
 if ! command -v sing-box &> /dev/null; then
-    echo "请安装 sing-box 后再执行。"
+    echo "Please install sing-box before executing."
     sudo bash /etc/sing-box/scripts/install_singbox.sh
     exit 1
 fi
 
-# 停止 sing-box 服务
+# Stop sing-box service
 function stop_singbox() {
     sudo systemctl stop sing-box
     if ! systemctl is-active --quiet sing-box; then
-        echo "sing-box 已停止" >/dev/null
+        echo "sing-box has stopped" >/dev/null
     else
         exit 1
     fi
 }
 
-# 切换模式的逻辑
-echo "切换模式开始...请根据提示输入操作。"
+# Logic for switching modes
+echo "Switching mode starts...Please enter the operation according to the prompts."
 
 while true; do
-    # 选择模式
-    read -rp "请选择模式(1: TProxy 模式, 2: TUN 模式): " mode_choice
+    # Selection Mode
+    read -rp "Please select the mode (1: TProxy mode, 2: TUN mode): " mode_choice
 
     case $mode_choice in
         1)
             stop_singbox
             echo "MODE=TProxy" | sudo tee /etc/sing-box/mode.conf > /dev/null
-            echo -e "${GREEN}当前选择模式为:TProxy 模式${NC}"
+            echo -e "${GREEN}The current selected mode is: TProxy mode${NC}"
             break
             ;;
         2)
             stop_singbox
             echo "MODE=TUN" | sudo tee /etc/sing-box/mode.conf > /dev/null
-            echo -e "${GREEN}当前选择模式为:TUN 模式${NC}"
+            echo -e "${GREEN}The current selected mode is: TUN mode${NC}"
             break
             ;;
         *)
-            echo -e "${RED}无效的选择，请重新输入。${NC}"
+            echo -e "${RED}Invalid selection, please try again.${NC}"
             ;;
     esac
 done
