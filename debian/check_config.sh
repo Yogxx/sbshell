@@ -1,23 +1,23 @@
 #!/bin/bash
 
-# 定义颜色
+# Defining Colors
 CYAN='\033[0;36m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 CONFIG_FILE="/etc/sing-box/config.json"
 
-# 检查配置文件是否存在
+# Check if the configuration file exists
 if [ -f "$CONFIG_FILE" ]; then
-    echo -e "${CYAN}检查配置文件 ${CONFIG_FILE} ...${NC}"
-    # 验证配置文件
+    echo -e "${CYAN}Check the configuration file ${CONFIG_FILE} ...${NC}"
+    # Verify the configuration file
     if sing-box check -c "$CONFIG_FILE"; then
-        echo -e "${CYAN}配置文件验证通过！${NC}"
+        echo -e "${CYAN}Configuration file verification passed!${NC}"
     else
-        echo -e "${RED}配置文件验证失败！${NC}"
+        echo -e "${RED}Configuration file validation failed!${NC}"
         exit 1
     fi
 else
-    echo -e "${RED}配置文件 ${CONFIG_FILE} 不存在！${NC}"
+    echo -e "${RED}Configuration Files ${CONFIG_FILE} Doesn't exist!${NC}"
     exit 1
 fi
