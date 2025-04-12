@@ -15,7 +15,7 @@ mkdir -p "$TEMP_DIR"
 # 检查依赖并安装
 check_and_install_dependencies() {
     if ! command -v busybox &> /dev/null; then
-        echo -e "\e[31mbusybox 未安装，正在安装...\e[0m"
+        echo -e "\e[31mbusybox Not installed, installing...\e[0m"
         sudo apt-get update
         sudo apt-get install -y busybox
         export PATH=$PATH:/bin/busybox
@@ -41,9 +41,9 @@ get_download_url() {
 
 backup_and_remove_ui() {
     if [ -d "$UI_DIR" ]; then
-        echo -e "备份当前ui文件夹..."
+        echo -e "Back up the current ui folder..."
         mv "$UI_DIR" "$BACKUP_DIR/$(date +%Y%m%d%H%M%S)_ui"
-        echo -e "已备份至 $BACKUP_DIR"
+        echo -e "Backed up to $BACKUP_DIR"
     fi
 }
 
@@ -54,32 +54,32 @@ download_and_process_ui() {
     # 清理临时目录
     rm -rf "${TEMP_DIR:?}"/*
     
-    echo "正在下载面板..."
+    echo "Downloading Panel..."
     curl -L "$url" -o "$temp_file"
     if [ $? -ne 0 ]; then
-        echo -e "\e[31m下载失败,正在还原备份...\e[0m"
+        echo -e "\e[31mDownload failed, restoring backup...\e[0m"
         [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR/"* "$UI_DIR" 2>/dev/null
         return 1
     fi
 
     # 解压文件
-    echo "解压中..."
+    echo "Unzipping..."
     if unzip_with_busybox "$temp_file" "$TEMP_DIR"; then
         # 确保目标目录存在
         mkdir -p "$UI_DIR"
         rm -rf "${UI_DIR:?}"/*
         mv "$TEMP_DIR"/*/* "$UI_DIR"
-        echo -e "\e[32m面板安装完成\e[0m"
+        echo -e "\e[32mPanel installation completed\e[0m"
         return 0
     else
-        echo -e "\e[31m解压失败,正在还原备份...\e[0m"
+        echo -e "\e[31mUnzip failed, restoring backup...\e[0m"
         [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR/"* "$UI_DIR" 2>/dev/null
         return 1
     fi
 }
 
 install_default_ui() {
-    echo "正在安装默认ui面板..."
+    echo "Installing default ui panel..."
     DOWNLOAD_URL=$(get_download_url)
     backup_and_remove_ui
     download_and_process_ui "$DOWNLOAD_URL"
@@ -93,36 +93,36 @@ install_selected_ui() {
 
 check_ui() {
     if [ -d "$UI_DIR" ] && [ "$(ls -A "$UI_DIR")" ]; then
-        echo -e "\e[32mui面板已安装\e[0m"
+        echo -e "\e[32muiPanel installed\e[0m"
     else
-        echo -e "\e[31mui面板未安装或为空\e[0m"
+        echo -e "\e[31muiPanel not installed or empty\e[0m"
     fi
 }
 
 setup_auto_update_ui() {
     local schedule_choice
     while true; do
-        echo "请选择自动更新频率："
-        echo "1. 每周一"
-        echo "2. 每月1号"
-        read -rp "请输入选项(1/2, 默认为1): " schedule_choice
+        echo "Please select the automatic update frequency："
+        echo "1. Every Monday"
+        echo "2. 1st of every month"
+        read -rp "Please enter the option (1/2, default is 1): " schedule_choice
         schedule_choice=${schedule_choice:-1}
 
         if [[ "$schedule_choice" =~ ^[12]$ ]]; then
             break
         else
-            echo -e "\e[31m输入无效,请输入1或2。\e[0m"
+            echo -e "\e[31mInvalid input, please enter 1 or 2.\e[0m"
         fi
     done
 
     if crontab -l 2>/dev/null | grep -q '/etc/sing-box/update-ui.sh'; then
-        echo -e "\e[31m检测到已有自动更新任务。\e[0m"
-        read -rp "是否重新设置自动更新任务？(y/n): " confirm_reset
+        echo -e "\e[31mAn existing automatic update task has been detected.\e[0m"
+        read -rp "Do you want to reset the automatic update task? (y/n): " confirm_reset
         if [[ "$confirm_reset" =~ ^[Yy]$ ]]; then
             crontab -l 2>/dev/null | grep -v '/etc/sing-box/update-ui.sh' | crontab -
-            echo "已删除旧的自动更新任务。"
+            echo "The old auto-update task has been deleted."
         else
-            echo -e "\e[36m保持已有的自动更新任务。返回菜单。\e[0m"
+            echo -e "\e[36mKeep the existing automatic update tasks. Return to the menu.\e[0m"
             return
         fi
     fi
@@ -166,10 +166,10 @@ EOF
 
     if [ "$schedule_choice" -eq 1 ]; then
         (crontab -l 2>/dev/null; echo "0 0 * * 1 /etc/sing-box/update-ui.sh") | crontab -
-        echo -e "\e[32m定时更新任务已设置,每周一执行一次\e[0m"
+        echo -e "\e[32mThe scheduled update task has been set and will be executed every Monday\e[0m"
     else
         (crontab -l 2>/dev/null; echo "0 0 1 * * /etc/sing-box/update-ui.sh") | crontab -
-        echo -e "\e[32m定时更新任务已设置,每月1号执行一次\e[0m"
+        echo -e "\e[32mThe scheduled update task has been set and will be executed once on the 1st of each month\e[0m"
     fi
 
     systemctl restart cron
@@ -178,15 +178,15 @@ EOF
 update_ui() {
     check_and_install_dependencies  # 检查并安装依赖
     while true; do
-        echo "请选择功能："
-        echo "1. 默认ui(依据配置文件）"
-        echo "2. 安装/更新自选ui"
-        echo "3. 检查是否存在ui面板"
-        echo "4. 设置定时自动更新面板"
-        read -r -p "请输入选项(1/2/3/4)或按回车键退出: " choice
+        echo "Please select a function："
+        echo "1. Default ui (based on configuration file)"
+        echo "2. Install/update optional ui"
+        echo "3. Check if ui panel exists"
+        echo "4. Set up a scheduled automatic update panel"
+        read -r -p "Please enter an option (1/2/3/4) or press Enter to exit: " choice
 
         if [ -z "$choice" ]; then
-            echo "退出程序。"
+            echo "Exit the program."
             exit 0
         fi
 
@@ -196,11 +196,11 @@ update_ui() {
                 exit 0  # 更新结束后退出菜单
                 ;;
             2)
-                echo "请选择面板安装："
-                echo "1. zashboard面板"
-                echo "2. metacubexd面板"
-                echo "3. yacd面板"
-                read -r -p "请输入选项(1/2/3): " ui_choice
+                echo "Please select Panel Mount:"
+                echo "1. Zashboard panel"
+                echo "2. Metacubexd panel"
+                echo "3. Yacd panel"
+                read -r -p "Please enter your options (1/2/3): " ui_choice
 
                 case "$ui_choice" in
                     1)
@@ -213,7 +213,7 @@ update_ui() {
                         install_selected_ui "$YACD_URL"
                         ;;
                     *)
-                        echo -e "\e[31m无效选项,返回上级菜单。\e[0m"
+                        echo -e "\e[31mInvalid option, return to the previous menu.\e[0m"
                         ;;
                 esac
                 exit 0  # 更新结束后退出菜单
@@ -225,7 +225,7 @@ update_ui() {
                 setup_auto_update_ui
                 ;;
             *)
-                echo -e "\e[31m无效选项,返回主菜单\e[0m"
+                echo -e "\e[31mInvalid option, return to main menu\e[0m"
                 ;;
         esac
     done
