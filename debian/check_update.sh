@@ -36,14 +36,14 @@ if command -v sing-box &> /dev/null; then
                 break
                 ;;
             '')
-                echo "不进行版本切换"
+                echo "Do not switch versions"
                 break
                 ;;
             *)
-                echo -e "${RED}无效的选择，请输入 1 或 2。${NC}"
+                echo -e "${RED}Invalid selection, please enter 1 or 2.${NC}"
                 ;;
         esac
     done
 else
-    echo -e "${RED}sing-box 未安装${NC}"
+    echo -e "${RED}sing-box not installed${NC}"
 fi
