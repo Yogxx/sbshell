@@ -51,7 +51,7 @@ if grep -qi 'debian\|ubuntu\|armbian' /etc/os-release; then
         fi
 
         if ! $CHECK_CMD &> /dev/null; then
-            echo -e "${RED}$DEP 未安装。${NC}"
+            echo -e "${RED}$DEP Not installed.${NC}"
             read -rp "Do you want to install $DEP? (y/n): " install_dep
             if [[ "$install_dep" =~ ^[Yy]$ ]]; then
                 sudo apt-get update
@@ -79,7 +79,7 @@ elif grep -qi 'openwrt' /etc/os-release; then
         fi
 
         if ! $CHECK_CMD &> /dev/null; then
-            echo -e "${RED}$DEP 未安装。${NC}"
+            echo -e "${RED}$DEP Not installed.${NC}"
             read -rp "Do you want to install $DEP? (y/n): " install_dep
             if [[ "$install_dep" =~ ^[Yy]$ ]]; then
                 opkg update
