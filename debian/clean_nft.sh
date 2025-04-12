@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 清理防火墙规则并停止服务
+# Clear firewall rules and stop services
 sudo systemctl stop sing-box
 nft flush ruleset
 
-echo "sing-box 服务已停止,防火墙规则已清理."
+echo "The sing-box service has been stopped and the firewall rules have been cleared."
