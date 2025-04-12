@@ -1,0 +1,145 @@
+#!/bin/bash
+
+# Defining Colors
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Manually entered configuration files
+MANUAL_FILE="/etc/sing-box/manual.conf"
+DEFAULTS_FILE="/etc/sing-box/defaults.conf"
+
+# Get the current mode
+MODE=$(grep '^MODE=' /etc/sing-box/mode.conf | sed 's/^MODE=//')
+
+# Function that prompts the user whether to change the subscription
+prompt_user_input() {
+    while true; do
+        read -rp "Please enter the backend address (default value will be used if not filled in): " BACKEND_URL
+        if [ -z "$BACKEND_URL" ]; then
+            BACKEND_URL=$(grep BACKEND_URL "$DEFAULTS_FILE" 2>/dev/null | cut -d'=' -f2-)
+            if [ -z "$BACKEND_URL" ]; then
+                echo -e "${RED}No default value set, please set in the menu!${NC}"
+                continue
+            fi
+            echo -e "${CYAN}Use the default backend address: $BACKEND_URL${NC}"
+        fi
+        break
+    done
+
+    while true; do
+        read -rp "Please enter the subscription address (default value will be used if left blank): " SUBSCRIPTION_URL
+        if [ -z "$SUBSCRIPTION_URL" ]; then
+            SUBSCRIPTION_URL=$(grep SUBSCRIPTION_URL "$DEFAULTS_FILE" 2>/dev/null | cut -d'=' -f2-)
+            if [ -z "$SUBSCRIPTION_URL" ]; then
+                echo -e "${RED}No default value set, please set in the menu!${NC}"
+                continue
+            fi
+            echo -e "${CYAN}Use default subscription address: $SUBSCRIPTION_URL${NC}"
+        fi
+        break
+    done
+
+    while true; do
+        read -rp "Please enter the configuration file address (leave it blank to use the default value): " TEMPLATE_URL
+        if [ -z "$TEMPLATE_URL" ]; then
+            if [ "$MODE" = "TProxy" ]; then
+                TEMPLATE_URL=$(grep TPROXY_TEMPLATE_URL "$DEFAULTS_FILE" 2>/dev/null | cut -d'=' -f2-)
+                if [ -z "$TEMPLATE_URL" ]; then
+                    echo -e "${RED}No default value set, please set in the menu!${NC}"
+                    continue
+                fi
+                echo -e "${CYAN}Use the default TProxy configuration file address: $TEMPLATE_URL${NC}"
+            elif [ "$MODE" = "TUN" ]; then
+                TEMPLATE_URL=$(grep TUN_TEMPLATE_URL "$DEFAULTS_FILE" 2>/dev/null | cut -d'=' -f2-)
+                if [ -z "$TEMPLATE_URL" ]; then
+                    echo -e "${RED}No default value set, please set in the menu!${NC}"
+                    continue
+                fi
+                echo -e "${CYAN}Use the default TUN configuration file address: $TEMPLATE_URL${NC}"
+            else
+                echo -e "${RED}Unknown pattern: $MODE${NC}"
+                exit 1
+            fi
+        fi
+        break
+    done
+}
+
+# Prompt the user to change the subscription
+read -rp "Do you want to change the subscription address?(y/n): " change_subscription
+if [[ "$change_subscription" =~ ^[Yy]$ ]]; then
+    # Perform manual input of relevant content
+    while true; do
+        prompt_user_input
+
+        # Displays the configuration information entered by the user
+        echo -e "${CYAN}The configuration information you entered is as follows:${NC}"
+        echo "Backend address: $BACKEND_URL"
+        echo "Subscription Address: $SUBSCRIPTION_URL"
+        echo "Configuration file address: $TEMPLATE_URL"
+
+        read -rp "Confirm the entered configuration information?(y/n): " confirm_choice
+        if [[ "$confirm_choice" =~ ^[Yy]$ ]]; then
+            # Update manually entered configuration files
+            cat > "$MANUAL_FILE" <<EOF
+BACKEND_URL=$BACKEND_URL
+SUBSCRIPTION_URL=$SUBSCRIPTION_URL
+TEMPLATE_URL=$TEMPLATE_URL
+EOF
+
+            echo "Manually entered configuration updated"
+            break
+        else
+            echo -e "${RED}Please re-enter the configuration information.${NC}"
+        fi
+    done
+else
+    if [ ! -f "$MANUAL_FILE" ]; then
+        echo -e "${RED}The subscription address is empty, please set it!${NC}"
+        exit 1
+    fi
+
+    # Use the existing configuration and output debug information
+    BACKEND_URL=$(grep BACKEND_URL "$MANUAL_FILE" 2>/dev/null | cut -d'=' -f2-)
+    SUBSCRIPTION_URL=$(grep SUBSCRIPTION_URL "$MANUAL_FILE" 2>/dev/null | cut -d'=' -f2-)
+    TEMPLATE_URL=$(grep TEMPLATE_URL "$MANUAL_FILE" 2>/dev/null | cut -d'=' -f2-)
+
+    if [ -z "$BACKEND_URL" ] || [ -z "$SUBSCRIPTION_URL" ] || [ -z "$TEMPLATE_URL" ]; then
+        echo -e "${RED}The subscription address is empty, please set it!${NC}"
+        exit 1
+    fi
+
+    echo -e "${CYAN}The current configuration is as follows:${NC}"
+    echo "Backend address: $BACKEND_URL"
+    echo "Subscription Address: $SUBSCRIPTION_URL"
+    echo "Configuration file address: $TEMPLATE_URL"
+fi
+
+# Constructing the complete profile URL
+FULL_URL="${BACKEND_URL}/config/${SUBSCRIPTION_URL}&file=${TEMPLATE_URL}"
+echo "Generate full subscription link: $FULL_URL"
+
+# Back up the existing configuration file
+[ -f "/etc/sing-box/config.json" ] && cp /etc/sing-box/config.json /etc/sing-box/config.json.backup
+
+if curl -L --connect-timeout 10 --max-time 30 "$FULL_URL" -o /etc/sing-box/config.json; then
+    echo -e "${GREEN}Configuration file updated successfully!${NC}"
+    if ! sing-box check -c /etc/sing-box/config.json; then
+        echo -e "${RED}Configuration file verification failed, restore backup...${NC}"
+        [ -f "/etc/sing-box/config.json.backup" ] && cp /etc/sing-box/config.json.backup /etc/sing-box/config.json
+    fi
+else
+    echo -e "${RED}Configuration file download failed, restore backup...${NC}"
+    [ -f "/etc/sing-box/config.json.backup" ] && cp /etc/sing-box/config.json.backup /etc/sing-box/config.json
+fi
+
+# Restart sing-box and check the startup status
+/etc/init.d/sing-box start
+
+if /etc/init.d/sing-box status | grep -q "running"; then
+    echo -e "${GREEN}sing-box started successfully${NC}"
+else
+    echo -e "${RED}sing-box failed to start${NC}"
+fi
