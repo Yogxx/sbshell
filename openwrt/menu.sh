@@ -24,7 +24,7 @@ if ! grep -qi 'openwrt' /etc/os-release; then
 fi
 
 # The script's URL base path
-BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/qichiyuhub/sbshell/refs/heads/master/openwrt"
+BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/master/openwrt"
 
 # Script List
 SCRIPTS=(
