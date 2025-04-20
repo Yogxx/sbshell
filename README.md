@@ -20,13 +20,13 @@ Currently supported systems are deiban/ubuntu/armbian and openwrt!
 
 ## One-click script: (Please install curl and bash by yourself if they are missing)
 ```
-bash <(curl -sL https://gh-proxy.com/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/main//sbshall.sh)
+bash <(curl -sL https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/main//sbshall.sh)
 ```
 -- After the initialization is completed, enter "- After the initialization is completed, enter "**sb**" to enter the menu
 - Currently supported systems are
 ### System information automatically displays beautification script： 
 ```
-bash <(curl -sL https://gh-proxy.com/https://raw.githubusercontent.com/qljsyph/DPInfo-script/refs/heads/main/auto-sysinfo.sh)
+
 ```
   After execution, a lot of necessary information will be automatically displayed every time you enter ssh! After execution, a lot of necessary information will be automatically displayed every time you enter ssh! After execution, a lot of necessary information will be automatically displayed every time you enter ssh! 
 Warehouse
