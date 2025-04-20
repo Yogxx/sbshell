@@ -21,8 +21,8 @@ if ! grep -qi 'openwrt' /etc/os-release; then
     chown "$(whoami)":"$(whoami)" "$SCRIPT_DIR"
 fi
 
-# 脚本的URL基础路径
-BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/yogxx/sbshell/refs/heads/main/openwrt"
+# The script's URL base path
+BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/main/openwrt"
                                
 # 脚本列表
 SCRIPTS=(
