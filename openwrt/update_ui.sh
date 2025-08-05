@@ -22,7 +22,7 @@ mkdir -p "$TEMP_DIR"
 # 检查依赖并安装
 check_and_install_dependencies() {
     if ! command -v unzip &> /dev/null; then
-        echo -e "${RED}unzip 未安装，正在安装...${NC}"
+        echo -e "${RED}unzip is not installed, installing...${NC}"
         opkg update > /dev/null 2>&1
         opkg install unzip > /dev/null 2>&1
     fi
@@ -42,9 +42,9 @@ get_download_url() {
 
 backup_and_remove_ui() {
     if [ -d "$UI_DIR" ]; then
-        echo -e "${CYAN}备份当前ui文件夹...${NC}"
+        echo -e "${CYAN}Back up the current ui folder...${NC}"
         mv "$UI_DIR" "$BACKUP_DIR/$(date +%Y%m%d%H%M%S)_ui"
-        echo -e "${GREEN}已备份至 $BACKUP_DIR${NC}"
+        echo -e "${GREEN}Backed up to $BACKUP_DIR${NC}"
     fi
 }
 
@@ -55,32 +55,32 @@ download_and_process_ui() {
     # 清理临时目录
     rm -rf "${TEMP_DIR:?}"/*
     
-    echo -e "${CYAN}正在下载面板...${NC}"
+    echo -e "${CYAN}Downloading panel...${NC}"
     curl -L "$url" -o "$temp_file" > /dev/null 2>&1
     if [ $? -ne 0 ]; then
-        echo -e "${RED}下载失败,正在还原备份...${NC}"
+        echo -e "${RED}Download failed, restoring backup...${NC}"
         [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR/"* "$UI_DIR" 2>/dev/null
         return 1
     fi
 
     # 解压文件
-    echo -e "${CYAN}解压中...${NC}"
+    echo -e "${CYAN}Unzipping...${NC}"
     if unzip "$temp_file" -d "$TEMP_DIR" > /dev/null 2>&1; then
         # 确保目标目录存在
         mkdir -p "$UI_DIR"
         rm -rf "${UI_DIR:?}"/*
         mv "$TEMP_DIR"/*/* "$UI_DIR"
-        echo -e "${GREEN}面板安装完成${NC}"
+        echo -e "${GREEN}Panel installation completed${NC}"
         return 0
     else
-        echo -e "${RED}解压失败,正在还原备份...${NC}"
+        echo -e "${RED}Unzip failed, restoring backup...${NC}"
         [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR/"* "$UI_DIR" 2>/dev/null
         return 1
     fi
 }
 
 install_default_ui() {
-    echo -e "${CYAN}正在安装默认ui面板...${NC}"
+    echo -e "${CYAN}Installing default ui panel...${NC}"
     DOWNLOAD_URL=$(get_download_url)
     backup_and_remove_ui
     download_and_process_ui "$DOWNLOAD_URL"
@@ -94,36 +94,36 @@ install_selected_ui() {
 
 check_ui() {
     if [ -d "$UI_DIR" ] && [ "$(ls -A "$UI_DIR")" ]; then
-        echo -e "${GREEN}ui面板已安装${NC}"
+        echo -e "${GREEN}UI panel installed${NC}"
     else
-        echo -e "${RED}ui面板未安装或为空${NC}"
+        echo -e "${RED}The ui panel is not installed or is empty${NC}"
     fi
 }
 
 setup_auto_update_ui() {
     local schedule_choice
     while true; do
-        echo -e "${CYAN}请选择自动更新频率：${NC}"
-        echo "1. 每周一"
-        echo "2. 每月1号"
-        read -rp "请输入选项(1/2, 默认为1): " schedule_choice
+        echo -e "${CYAN}Please select the frequency of automatic updates:${NC}"
+        echo "1. Every Monday"
+        echo "2. 1st of every month"
+        read -rp "Please enter your options (1/2, default is 1): " schedule_choice
         schedule_choice=${schedule_choice:-1}
 
         if [[ "$schedule_choice" =~ ^[12]$ ]]; then
             break
         else
-            echo -e "${RED}输入无效,请输入1或2。${NC}"
+            echo -e "${RED}Invalid input, please enter 1 or 2.${NC}"
         fi
     done
 
     if crontab -l 2>/dev/null | grep -q '/etc/sing-box/update-ui.sh'; then
-        echo -e "${RED}检测到已有自动更新任务。${NC}"
-        read -rp "是否重新设置自动更新任务？(y/n): " confirm_reset
+        echo -e "${RED}An existing automatic update task has been detected.${NC}"
+        read -rp "Do you want to reset the automatic update task? (y/n): " confirm_reset
         if [[ "$confirm_reset" =~ ^[Yy]$ ]]; then
             crontab -l 2>/dev/null | grep -v '/etc/sing-box/update-ui.sh' | crontab -
-            echo "已删除旧的自动更新任务。"
+            echo "The old auto-update task has been deleted."
         else
-            echo -e "${CYAN}保持已有的自动更新任务。返回菜单。${NC}"
+            echo -e "${CYAN}Keep the existing automatic update task. Return to the menu.${NC}"
             return
         fi
     fi
@@ -157,7 +157,7 @@ if unzip "\$TEMP_DIR/ui.zip" -d "\$TEMP_DIR" > /dev/null 2>&1; then
     rm -rf "\${UI_DIR:?}"/*
     mv "\$TEMP_DIR"/*/* "\$UI_DIR"
 else
-    echo "解压失败，正在还原备份..."
+    echo "Unzip failed, restoring backup..."
     [ -d "\$BACKUP_DIR" ] && mv "\$BACKUP_DIR/"* "\$UI_DIR" 2>/dev/null
 fi
 
@@ -167,10 +167,10 @@ EOF
 
     if [ "$schedule_choice" -eq 1 ]; then
         (crontab -l 2>/dev/null; echo "0 0 * * 1 /etc/sing-box/update-ui.sh") | crontab -
-        echo -e "${GREEN}定时更新任务已设置,每周一执行一次${NC}"
+        echo -e "${GREEN}The scheduled update task has been set and will be executed every Monday${NC}"
     else
         (crontab -l 2>/dev/null; echo "0 0 1 * * /etc/sing-box/update-ui.sh") | crontab -
-        echo -e "${GREEN}定时更新任务已设置,每月1号执行一次${NC}"
+        echo -e "${GREEN}The scheduled update task has been set and will be executed once a month on the 1st${NC}"
     fi
 
     systemctl restart cron
@@ -179,15 +179,15 @@ EOF
 update_ui() {
     check_and_install_dependencies  # 检查并安装依赖
     while true; do
-        echo -e "${CYAN}请选择功能：${NC}"
-        echo "1. 默认ui(依据配置文件）"
-        echo "2. 安装/更新自选ui"
-        echo "3. 检查是否存在ui面板"
-        echo "4. 设置定时自动更新面板"
-        read -r -p "请输入选项(1/2/3/4)或按回车键退出: " choice
+        echo -e "${CYAN}Please select a function:${NC}"
+        echo "1. Default UI (based on configuration file)"
+        echo "2. Install/update optional UI"
+        echo "3. Check if ui panel exists"
+        echo "4. Set up a scheduled automatic update panel"
+        read -r -p "Please enter an option (1/2/3/4) or press Enter to exit: " choice
 
         if [ -z "$choice" ]; then
-            echo "退出程序。"
+            echo "Exit the program."
             exit 0
         fi
 
@@ -197,11 +197,11 @@ update_ui() {
                 exit 0  # 更新结束后退出菜单
                 ;;
             2)
-                echo -e "${CYAN}请选择面板安装：${NC}"
-                echo "1. zashboard面板"
-                echo "2. metacubexd面板"
-                echo "3. yacd面板"
-                read -r -p "请输入选项(1/2/3): " ui_choice
+                echo -e "${CYAN}Please select Panel Mount:${NC}"
+                echo "1. Zashboard"
+                echo "2. metacubexd panel"
+                echo "3. yacd panel"
+                read -r -p "Please enter options(1/2/3): " ui_choice
 
                 case "$ui_choice" in
                     1)
@@ -214,7 +214,7 @@ update_ui() {
                         install_selected_ui "$YACD_URL"
                         ;;
                     *)
-                        echo -e "${RED}无效选项,返回上级菜单。${NC}"
+                        echo -e "${RED}Invalid option, return to the previous menu.${NC}"
                         ;;
                 esac
                 exit 0  # 更新结束后退出菜单
@@ -226,7 +226,7 @@ update_ui() {
                 setup_auto_update_ui
                 ;;
             *)
-                echo -e "${RED}无效选项,返回主菜单${NC}"
+                echo -e "${RED}Invalid option, return to main menu${NC}"
                 ;;
         esac
     done
