@@ -23,8 +23,8 @@ check_route_exists() {
 # 创建路由表，如果不存在的话
 create_route_table_if_not_exists() {
     if ! check_route_exists "$PROXY_ROUTE_TABLE"; then
-        echo "路由表不存在，正在创建..."
-        ip route add local default dev "$INTERFACE" table "$PROXY_ROUTE_TABLE" || { echo "创建路由表失败"; exit 1; }
+        echo "The routing table does not exist, creating..."
+        ip route add local default dev "$INTERFACE" table "$PROXY_ROUTE_TABLE" || { echo "Failed to create routing table"; exit 1; }
     fi
 }
 
@@ -35,10 +35,10 @@ wait_for_fib_table() {
         if ip route show table "$PROXY_ROUTE_TABLE" >/dev/null 2>&1; then
             return 0
         fi
-        echo "等待 FIB 表加载中，等待 $i 秒..."
+        echo "Waiting for FIB table to load, waiting for $i seconds..."
         i=$((i + 1))
     done
-    echo "FIB 表加载失败，超出最大重试次数"
+    echo "Failed to load the FIB table. Maximum number of retries exceeded."
     return 1
 }
 
@@ -47,19 +47,19 @@ clearSingboxRules() {
     nft list table inet sing-box >/dev/null 2>&1 && nft delete table inet sing-box
     ip rule del fwmark $PROXY_FWMARK lookup $PROXY_ROUTE_TABLE 2>/dev/null
     ip route del local default dev "${INTERFACE}" table $PROXY_ROUTE_TABLE 2>/dev/null
-    echo "清理 sing-box 相关的防火墙规则"
+    echo "Clean up the firewall rules related to sing-box"
 }
 
 # 仅在 TProxy 模式下应用防火墙规则
 if [ "$MODE" = "TProxy" ]; then
-    echo "应用 TProxy 模式下的防火墙规则..."
+    echo "Applying firewall rules in TProxy mode..."
 
     # 创建并确保路由表存在
     create_route_table_if_not_exists
 
     # 等待 FIB 表加载完成
     if ! wait_for_fib_table; then
-        echo "FIB 表准备失败，退出脚本。"
+        echo "FIB table preparation failed, exiting script."
         exit 1
     fi
 
@@ -155,7 +155,7 @@ EOF
     # 持久化防火墙规则
     nft list ruleset > /etc/nftables.conf
 
-    echo "TProxy 模式的防火墙规则已应用。"
+    echo "Firewall rules for TProxy mode are applied."
 else
-    echo "当前模式为 TUN 模式，不需要应用防火墙规则。" >/dev/null 2>&1
+    echo "The current mode is TUN mode and no firewall rules need to be applied." >/dev/null 2>&1
 fi
