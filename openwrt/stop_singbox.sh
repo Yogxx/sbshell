@@ -10,29 +10,29 @@ SCRIPT_DIR="/etc/sing-box/scripts"
 
 # 停止 sing-box 服务
 stop_singbox() {
-    echo -e "${CYAN}正在停止 sing-box 服务...${NC}"
+    echo -e "${CYAN}Stopping sing-box service...${NC}"
     /etc/init.d/sing-box stop
     result=$?
     if [ $result -ne 0 ]; then
-        echo -e "${CYAN}停止 sing-box 服务失败，返回码: $result${NC}"
+        echo -e "${CYAN}Failed to stop sing-box service, return code: $result${NC}"
     else
-        echo -e "${GREEN}sing-box 已成功停止。${NC}"
+        echo -e "${GREEN}sing-box stopped successfully.${NC}"
     fi
 
-    read -rp "是否清理防火墙规则？(y/n): " confirm_cleanup
+    read -rp "Do you want to clear firewall rules? (y/n): " confirm_cleanup
     if [[ "$confirm_cleanup" =~ ^[Yy]$ ]]; then
-        echo -e "${CYAN}执行清理防火墙规则...${NC}"
+        echo -e "${CYAN}Execute cleanup firewall rules...${NC}"
         bash "$SCRIPT_DIR/clean_nft.sh"
-        echo -e "${GREEN}防火墙规则清理完毕${NC}"
+        echo -e "${GREEN}Firewall rules cleared${NC}"
     else
-        echo -e "${CYAN}已取消清理防火墙规则。${NC}"
+        echo -e "${CYAN}Cleanup of firewall rules has been canceled.${NC}"
     fi
 }
 
-read -rp "是否停止 sing-box?(y/n): " confirm_stop
+read -rp "Do you want to stop sing-box?(y/n): " confirm_stop
 if [[ "$confirm_stop" =~ ^[Yy]$ ]]; then
     stop_singbox
 else
-    echo -e "${CYAN}已取消停止 sing-box。${NC}"
+    echo -e "${CYAN}Stop sing-box has been cancelled.${NC}"
     exit 0
 fi
