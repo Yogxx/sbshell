@@ -6,17 +6,17 @@ RED='\033[0;31m'
 NC='\033[0m' # 无颜色
 
 if command -v sing-box &> /dev/null; then
-    echo -e "${CYAN}sing-box 已安装，跳过安装步骤${NC}"
+    echo -e "${CYAN}sing-box is already installed, skip the installation steps${NC}"
 else
-    echo "正在更新包列表并安装 sing-box,请稍候..."
+    echo "Updating package lists and installing sing-box, please wait..."
     opkg update >/dev/null 2>&1
     opkg install kmod-nft-tproxy >/dev/null 2>&1
     opkg install sing-box >/dev/null 2>&1
 
     if command -v sing-box &> /dev/null; then
-        echo -e "${CYAN}sing-box 安装成功${NC}"
+        echo -e "${CYAN}sing-box installed successfully${NC}"
     else
-        echo -e "${RED}sing-box 安装失败，请检查日志或网络配置${NC}"
+        echo -e "${RED}sing-box installation failed, please check the log or network configuration${NC}"
         exit 1
     fi
 fi
@@ -59,4 +59,4 @@ chmod +x /etc/init.d/sing-box
 /etc/init.d/sing-box enable
 /etc/init.d/sing-box start
 
-echo -e "${CYAN}sing-box 服务已启用并启动${NC}"
+echo -e "${CYAN}sing-box service is enabled and started${NC}"
