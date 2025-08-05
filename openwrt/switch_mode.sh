@@ -7,7 +7,7 @@ NC='\033[0m' # 无颜色
 
 # 检查 sing-box 是否已安装
 if ! command -v sing-box &> /dev/null; then
-    echo "请安装 sing-box 后再执行。"
+    echo "Please install sing-box before executing this command."
     bash /etc/sing-box/scripts/install_singbox.sh
     exit 1
 fi
@@ -17,28 +17,28 @@ mkdir -p /etc/sing-box/
 [ -f /etc/sing-box/mode.conf ] || touch /etc/sing-box/mode.conf
 chmod 777 /etc/sing-box/mode.conf
 
-echo "切换模式开始...请根据提示输入操作。"
+echo "Switching mode starts...Please enter the operation according to the prompts."
 
 
 while true; do
     # 选择模式
-    read -rp "请选择模式(1: TProxy 模式, 2: TUN 模式): " mode_choice
+    read -rp "Please select the mode (1: TProxy mode, 2: TUN mode): " mode_choice
 
     /etc/init.d/sing-box stop
 
     case $mode_choice in
         1)
             echo "MODE=TProxy" | tee /etc/sing-box/mode.conf > /dev/null
-            echo -e "${GREEN}当前选择模式为:TProxy 模式${NC}"
+            echo -e "${GREEN}The current selected mode is: TProxy mode${NC}"
             break
             ;;
         2)
             echo "MODE=TUN" | tee /etc/sing-box/mode.conf > /dev/null
-            echo -e "${GREEN}当前选择模式为:TUN 模式${NC}"
+            echo -e "${GREEN}The current selected mode is: TUN mode${NC}"
             break
             ;;
         *)
-            echo -e "${RED}无效的选择，请重新输入。${NC}"
+            echo -e "${RED}Invalid selection, please re-enter.${NC}"
             ;;
     esac
 done
