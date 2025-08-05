@@ -13,11 +13,11 @@ clearTProxyRules() {
     nft list table inet sing-box >/dev/null 2>&1 && nft delete table inet sing-box
     ip rule del fwmark $PROXY_FWMARK lookup $PROXY_ROUTE_TABLE 2>/dev/null
     ip route del local default dev "$INTERFACE" table $PROXY_ROUTE_TABLE 2>/dev/null
-    echo "清理 TProxy 模式的防火墙规则"
+    echo "Clean up firewall rules for TProxy mode"
 }
 
 if [ "$MODE" = "TUN" ]; then
-    echo "应用 TUN 模式下的防火墙规则..."
+    echo "Applying firewall rules in TUN mode..."
 
     # 清理 TProxy 模式的防火墙规则
     clearTProxyRules
@@ -46,7 +46,7 @@ EOF
     # 持久化防火墙规则
     nft list ruleset > /etc/nftables.conf
 
-    echo "TUN 模式的防火墙规则已应用。"
+    echo "TUN mode firewall rules are applied."
 else
-    echo "当前模式不是 TUN 模式，跳过防火墙规则配置。" >/dev/null 2>&1
+    echo "The current mode is not TUN mode, skipping firewall rule configuration." >/dev/null 2>&1
 fi
