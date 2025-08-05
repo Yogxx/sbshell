@@ -9,15 +9,15 @@ CONFIG_FILE="/etc/sing-box/config.json"
 
 # 检查配置文件是否存在
 if [ -f "$CONFIG_FILE" ]; then
-    echo -e "${CYAN}检查配置文件 ${CONFIG_FILE} ...${NC}"
+    echo -e "${CYAN}Check the configuration file ${CONFIG_FILE} ...${NC}"
     # 验证配置文件
     if sing-box check -c "$CONFIG_FILE"; then
-        echo -e "${CYAN}配置文件验证通过！${NC}"
+        echo -e "${CYAN}Configuration file verification passed!${NC}"
     else
-        echo -e "${RED}配置文件验证失败！${NC}"
+        echo -e "${RED}Configuration file validation failed!${NC}"
         exit 1
     fi
 else
-    echo -e "${RED}配置文件 ${CONFIG_FILE} 不存在！${NC}"
+    echo -e "${RED}Configuration file ${CONFIG_FILE} does not exist!${NC}"
     exit 1
 fi
