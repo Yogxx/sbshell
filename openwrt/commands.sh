@@ -8,42 +8,42 @@ RED='\033[0;31m'
 NC='\033[0m' # 无颜色
 
 function view_firewall_rules() {
-    echo -e "${YELLOW}查看防火墙规则...${NC}"
+    echo -e "${YELLOW}View firewall rules...${NC}"
     nft list ruleset
-    read -rp "按回车键返回二级菜单..."
+    read -rp "Press Enter to return to the secondary menu..."
 }
 
 function check_config() {
-    echo -e "${YELLOW}检查配置文件...${NC}"
+    echo -e "${YELLOW}Checking configuration files...${NC}"
     bash /etc/sing-box/scripts/check_config.sh
-    read -rp "按回车键返回二级菜单..."
+    read -rp "Press Enter to return to the secondary menu..."
 }
 
 function view_logs() {
-    echo -e "${YELLOW}日志生成中，请等待...${NC}"
-    echo -e "${RED}按 Ctrl + C 结束日志输出${NC}"
+    echo -e "${YELLOW}Log is being generated, please wait...${NC}"
+    echo -e "${RED}Press Ctrl + C to end log output${NC}"
     logread -f | grep sing-box
-    read -rp "按回车键返回二级菜单..."
+    read -rp "Press Enter to return to the secondary menu..."
 }
 
 function show_submenu() {
-    echo -e "${CYAN}=========== 二级菜单选项 ===========${NC}"
-    echo -e "${MAGENTA}1. 查看防火墙规则${NC}"
-    echo -e "${MAGENTA}2. 检查配置文件${NC}"
-    echo -e "${MAGENTA}3. 查看实时日志${NC}"
-    echo -e "${MAGENTA}0. 返回主菜单${NC}"
+    echo -e "${CYAN}=========== Secondary menu options ===========${NC}"
+    echo -e "${MAGENTA}1. View firewall rules${NC}"
+    echo -e "${MAGENTA}2. Check the configuration file${NC}"
+    echo -e "${MAGENTA}3. View real-time logs${NC}"
+    echo -e "${MAGENTA}0. Return to main menu${NC}"
     echo -e "${CYAN}===================================${NC}"
 }
 
 function handle_submenu_choice() {
     while true; do
-        read -rp "请选择操作: " choice
+        read -rp "Please select an action: " choice
         case $choice in
             1) view_firewall_rules ;;
             2) check_config ;;
             3) view_logs ;;
             0) return 0 ;;
-            *) echo -e "${RED}无效的选择${NC}" ;;
+            *) echo -e "${RED}Invalid selection${NC}" ;;
         esac
         show_submenu
     done
