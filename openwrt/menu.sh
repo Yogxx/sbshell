@@ -22,7 +22,7 @@ if ! grep -qi 'openwrt' /etc/os-release; then
 fi
 
 # 脚本的URL基础路径
-BASE_URL="https://gh-proxy.com/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/main/openwrt"
+BASE_URL="https://ghfast.top/https://raw.githubusercontent.com/Yogxx/sbshell/refs/heads/main/openwrt"
                                
 # 脚本列表
 SCRIPTS=(
@@ -57,12 +57,12 @@ download_script() {
             chmod +x "$SCRIPT_DIR/$SCRIPT"
             return 0
         else
-            echo -e "${YELLOW}Download $SCRIPT Failed, try again $i/${RETRIES}...${NC}"
+            echo -e "${YELLOW}Downloading $SCRIPT failed, try again $i/${RETRIES}...${NC}"
             sleep "$RETRY_DELAY"
         fi
     done
 
-    echo -e "${RED}Download $SCRIPT Failed, please check your network connection.${NC}"
+    echo -e "${RED}download $SCRIPT Failed, please check your network connection.${NC}"
     return 1
 }
 
@@ -88,7 +88,7 @@ check_and_download_scripts() {
     done
 
     if [ ${#missing_scripts[@]} -ne 0 ]; then
-        echo -e "${CYAN}Downloading script, please wait patiently...${NC}"
+        echo -e "${CYAN}The script is downloading, please be patient...${NC}"
         for SCRIPT in "${missing_scripts[@]}"; do
             download_script "$SCRIPT" || {
                 echo -e "${RED}Downloading $SCRIPT failed, do you want to try again? (y/n): ${NC}"
@@ -138,7 +138,7 @@ if [ ! -f "$INITIALIZED_FILE" ]; then
     echo -e "${CYAN}Press Enter to enter the initialization boot settings, enter skip to skip the boot${NC}"
     read -r init_choice
     if [[ "$init_choice" =~ ^[Ss]kip$ ]]; then
-        echo -e "${CYAN}Skip the initial boot and go directly to the menu...${NC}"
+        echo -e "${CYAN}Skip the initialization boot and go directly to the menu...${NC}"
     else
         initialize
     fi
@@ -168,12 +168,12 @@ show_menu() {
     echo -e "${GREEN}8. Common commands${NC}"
     echo -e "${GREEN}9. Update Script${NC}"
     echo -e "${GREEN}10. Update Control Panel${NC}"
-    echo -e "${GREEN}0. Exit${NC}"
+    echo -e "${GREEN}0. quit${NC}"
     echo -e "${CYAN}=======================================${NC}"
 }
 
 handle_choice() {
-    read -rp "Please select an action: " choice
+    read -rp "Please select an operation: " choice
     case $choice in
         1)
             bash "$SCRIPT_DIR/switch_mode.sh"
